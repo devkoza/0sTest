@@ -1,0 +1,182 @@
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters", "fullTextSearch", "fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  remember          Boolean?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+
+  @@map("users")
+
+}
+model Trip {
+  id            String          @id @default(cuid())
+  tripId            String
+  malindi Boolean @default(false)
+  kilifi Boolean @default(false)
+  diani Boolean @default(false)
+  watamu Boolean @default(false)
+  mombasa Boolean @default(false)
+  mtwapa Boolean @default(false)
+  tripGuests Int @default(0)
+  tripType Int @default(0)
+  tripBudget Int @default(0)
+  emailVerified DateTime?
+  image         String?
+  standard Boolean @default(false)
+  luxury Boolean @default(false)
+  driver Boolean @default(false)
+  photographer Boolean @default(false)
+  guide Boolean @default(false)
+  boat Boat[]
+
+  @@index([tripId])
+
+  @@map("trips")  
+
+}
+
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+ 
+model Account {
+  id                String          @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+
+}
+
+model Boat{
+  id          String          @id @default(uuid())
+  slug         String
+  userId        String
+  boatName String @db.Text
+  boatDescription String
+  boatRegistration String @db.Text
+  boatLicense String
+  captainLicense String
+  scubaLicense String
+  image String?
+  location String
+
+  malindi Boolean @default(false)
+  kilifi Boolean @default(false)
+  diani Boolean @default(false)
+  watamu Boolean @default(false)
+  mombasa Boolean @default(false)
+  mtwapa Boolean @default(false)
+  boatType String
+  boatLength Int @default(0)
+  boatWidth Int @default(0)
+  boatHeight Int @default(0)
+  boatGuests Int @default(0)
+  boatPrice Int
+  boatMake String?
+  boatModel String?
+  boatYear Int?
+
+  private Boolean @default(false)
+  shared Boolean @default(false)
+  wifi Boolean @default(false)
+  crew Boolean @default(false)
+  food Boolean @default(false)
+  drinks Boolean @default(false)
+  gps Boolean @default(false)
+  
+  radio Boolean @default(false)
+  lifeJackets Boolean @default(false)
+  equipment Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  activity Activity[]
+  bookings Booking[]
+  trip Trip[]
+  
+
+  // @@fulltext([boatName])
+
+}
+
+model Activity {
+  id String @id @default(uuid())
+  title String?
+  snorkeling Boolean?
+  fishing Boolean?
+  scubadiving Boolean?
+  watersports Boolean?
+  description String?
+  image String?
+  marineParkFees Int
+
+
+  Boat Boat? @relation(fields: [boatId], references: [id], onDelete: Cascade)
+  boatId String
+
+  Booking Booking[]
+  @@index([boatId])
+  
+}
+
+model Booking {
+  id String @id @default(uuid())
+  username String
+  boatId String
+  userId String
+  activityId String
+  boatOwnerId String
+  startDate DateTime
+  endDate DateTime
+  driverIncluded Boolean
+  photographerIncluded Boolean
+  currency String
+  totalPrice Int
+  paymentStatus Boolean @default(false)
+  paymentIntentId String @unique
+  bookedAt DateTime @default(now())
+
+  Boat Boat? @relation(fields: [boatId], references: [id]) 
+  Activity Activity? @relation(fields: [activityId], references: [id])
+
+
+
+  @@index([boatId])
+  @@index([activityId])
+  
+}
+ 
