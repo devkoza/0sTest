@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {Boat, Activity} from "@prisma/client";
+import { Trip} from "@prisma/client";
 import { useForm } from "react-hook-form";
 import * as z from "zod"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
@@ -14,7 +14,6 @@ interface AddTripFormProps{
     trip?: Trip & {
         trips: Trip[]
     }
-    trip?: Trip
     handleDialogueOpen: ({trip, handleDialogueOpen}:AddTripFormProps) => void
 }
 
